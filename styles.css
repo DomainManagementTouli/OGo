@@ -1,0 +1,452 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 250px 1fr 280px;
+    gap: 20px;
+    padding: 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.toolbar {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 240px);
+}
+
+.tool-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.tool-section:last-child {
+    border-bottom: none;
+}
+
+.tool-section h3 {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border: none;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: white;
+}
+
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 0.85em;
+}
+
+.tool-btn {
+    border: 2px solid transparent;
+}
+
+.tool-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #764ba2;
+}
+
+.canvas-wrapper {
+    background: #e9ecef;
+    border-radius: 8px;
+    overflow: auto;
+    position: relative;
+}
+
+.pdf-container {
+    min-height: 600px;
+    position: relative;
+}
+
+.upload-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-content {
+    text-align: center;
+    color: #6c757d;
+}
+
+.placeholder-icon {
+    font-size: 6em;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.placeholder-content h2 {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+#pdfCanvas {
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: crosshair;
+}
+
+.form-field {
+    position: absolute;
+    border: 2px solid #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #495057;
+    user-select: none;
+}
+
+.form-field.selected {
+    border-color: #f45c43;
+    box-shadow: 0 0 0 3px rgba(244, 92, 67, 0.3);
+}
+
+.form-field.checkbox {
+    width: 20px;
+    height: 20px;
+}
+
+.form-field.signature {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.form-field.indicator {
+    background: transparent;
+    border: 1px dashed #6c757d;
+    font-size: 24px;
+}
+
+.field-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 50%;
+}
+
+.field-handle.nw { top: -4px; left: -4px; cursor: nw-resize; }
+.field-handle.ne { top: -4px; right: -4px; cursor: ne-resize; }
+.field-handle.sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+.field-handle.se { bottom: -4px; right: -4px; cursor: se-resize; }
+
+.properties-panel {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 240px);
+}
+
+.properties-panel h3 {
+    margin-bottom: 20px;
+    color: #495057;
+    font-size: 1.1em;
+}
+
+.property-group {
+    margin-bottom: 15px;
+}
+
+.property-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.property-group input,
+.property-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+.property-group input[type="color"] {
+    height: 40px;
+    padding: 4px;
+}
+
+.property-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    border-radius: 12px;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.5em;
+    color: #495057;
+}
+
+.close {
+    font-size: 28px;
+    font-weight: bold;
+    color: #adb5bd;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #495057;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+#signatureCanvas {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: white;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.signature-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.signature-actions .btn {
+    flex: 1;
+}
+
+#savedSignaturesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.saved-signature-item {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+}
+
+.saved-signature-item:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.saved-signature-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.saved-signature-item .signature-actions-small {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.saved-signature-item button {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.saved-signature-item .use-btn {
+    background: #667eea;
+    color: white;
+}
+
+.saved-signature-item .delete-btn {
+    background: #eb3349;
+    color: white;
+}
+
+@media (max-width: 1400px) {
+    .main-content {
+        grid-template-columns: 220px 1fr 250px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar,
+    .properties-panel {
+        max-height: none;
+    }
+}
+
+/* Page navigation for multi-page PDFs */
+.page-controls {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 10;
+}
+
+.page-controls button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.page-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.page-controls span {
+    font-size: 0.9em;
+    color: #495057;
+}
