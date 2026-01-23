@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fillable PDF Creator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Free Fillable PDF Creator</h1>
+            <p>Transform any PDF into a fillable form</p>
+        </header>
+
+        <!-- Upload Section -->
+        <div id="uploadSection" class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <h2>Upload Your PDF</h2>
+                <p>Click to browse or drag and drop your PDF file here</p>
+                <input type="file" id="pdfInput" accept=".pdf" hidden>
+                <button class="btn-primary" onclick="document.getElementById('pdfInput').click()">Choose File</button>
+            </div>
+        </div>
+
+        <!-- Editor Section -->
+        <div id="editorSection" class="editor-section" style="display: none;">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <h3>Form Fields</h3>
+                    <button class="tool-btn" data-tool="text" title="Add Text Field">
+                        <span class="icon">T</span> Text Field
+                    </button>
+                    <button class="tool-btn" data-tool="checkbox" title="Add Checkbox">
+                        <span class="icon">☑</span> Checkbox
+                    </button>
+                    <button class="tool-btn" data-tool="signature" title="Add Signature">
+                        <span class="icon">✍</span> Signature
+                    </button>
+                </div>
+
+                <div class="toolbar-group">
+                    <h3>Indicators</h3>
+                    <button class="tool-btn" data-tool="indicator" data-symbol="✓" title="Check Mark">
+                        <span class="icon">✓</span> Check
+                    </button>
+                    <button class="tool-btn" data-tool="indicator" data-symbol="✗" title="X Mark">
+                        <span class="icon">✗</span> X Mark
+                    </button>
+                    <button class="tool-btn" data-tool="indicator" data-symbol="→" title="Arrow">
+                        <span class="icon">→</span> Arrow
+                    </button>
+                    <button class="tool-btn" data-tool="indicator" data-symbol="★" title="Star">
+                        <span class="icon">★</span> Star
+                    </button>
+                    <button class="tool-btn" data-tool="indicator" data-symbol="!" title="Important">
+                        <span class="icon">!</span> Important
+                    </button>
+                </div>
+
+                <div class="toolbar-group">
+                    <h3>Actions</h3>
+                    <button class="tool-btn" id="createSignatureBtn" title="Create Signature">
+                        <span class="icon">🖊</span> Create Signature
+                    </button>
+                    <button class="tool-btn" id="clearAllBtn" title="Clear All Fields">
+                        <span class="icon">🗑</span> Clear All
+                    </button>
+                    <button class="btn-primary" id="downloadBtn">
+                        <span class="icon">⬇</span> Download Fillable PDF
+                    </button>
+                    <button class="btn-secondary" id="newPdfBtn">
+                        <span class="icon">📄</span> New PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Canvas Area -->
+            <div class="canvas-container">
+                <div class="page-controls">
+                    <button id="prevPage" class="nav-btn">← Previous</button>
+                    <span id="pageInfo">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                    <button id="nextPage" class="nav-btn">Next →</button>
+                    <div class="zoom-controls">
+                        <button id="zoomOut" class="nav-btn">-</button>
+                        <span id="zoomLevel">100%</span>
+                        <button id="zoomIn" class="nav-btn">+</button>
+                    </div>
+                </div>
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <canvas id="pdfCanvas"></canvas>
+                    <div id="fieldsOverlay" class="fields-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Properties Panel -->
+            <div class="properties-panel" id="propertiesPanel" style="display: none;">
+                <h3>Field Properties</h3>
+                <div id="propertiesContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div id="signatureModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Your Signature</h2>
+                <button class="close-btn" id="closeSignatureModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="signature-tabs">
+                    <button class="tab-btn active" data-tab="draw">Draw</button>
+                    <button class="tab-btn" data-tab="type">Type</button>
+                    <button class="tab-btn" data-tab="saved">Saved Signatures</button>
+                </div>
+
+                <div id="drawTab" class="tab-content active">
+                    <canvas id="signatureCanvas"></canvas>
+                    <div class="signature-controls">
+                        <label>
+                            Line Width: <input type="range" id="lineWidth" min="1" max="5" value="2">
+                        </label>
+                        <label>
+                            Color: <input type="color" id="signatureColor" value="#000000">
+                        </label>
+                        <button class="btn-secondary" id="clearSignature">Clear</button>
+                    </div>
+                </div>
+
+                <div id="typeTab" class="tab-content">
+                    <input type="text" id="signatureText" placeholder="Type your signature" class="signature-input">
+                    <div class="font-options">
+                        <label>Font:</label>
+                        <select id="signatureFont">
+                            <option value="Brush Script MT, cursive">Brush Script</option>
+                            <option value="Lucida Handwriting, cursive">Lucida Handwriting</option>
+                            <option value="Dancing Script, cursive">Dancing Script</option>
+                            <option value="Pacifico, cursive">Pacifico</option>
+                        </select>
+                    </div>
+                    <canvas id="typedSignatureCanvas"></canvas>
+                </div>
+
+                <div id="savedTab" class="tab-content">
+                    <div id="savedSignatures" class="saved-signatures-grid"></div>
+                    <p class="empty-message">No saved signatures yet</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelSignature">Cancel</button>
+                <button class="btn-primary" id="saveSignature">Save & Use</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
