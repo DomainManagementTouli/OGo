@@ -1,0 +1,27 @@
+{
+  "name": "opengov-decentralized-governance",
+  "version": "1.0.0",
+  "description": "Open-source decentralized governance system for transparent democratic participation — voting on laws, amendments, and citizen petitions with cryptographic verification and an immutable audit ledger.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test/run.js",
+    "node": "node index.js --mode node",
+    "web": "node index.js --mode web",
+    "demo": "node test/demo.js"
+  },
+  "keywords": [
+    "decentralized",
+    "governance",
+    "voting",
+    "blockchain",
+    "democracy",
+    "transparency",
+    "petition",
+    "open-source"
+  ],
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
