@@ -39,6 +39,11 @@ class GovernanceServer {
       this.petitionManager,
     );
 
+    // Biometric credential store: fingerprint -> { credentialId, publicKey, counter, enrolledAt }
+    this.biometricCredentials = new Map();
+    // Active biometric challenges: challengeId -> { fingerprint, challenge, expiresAt }
+    this.biometricChallenges = new Map();
+
     this.server = null;
   }
 
@@ -84,6 +89,11 @@ class GovernanceServer {
       }
       if (method === "GET" && pathname.startsWith("/js/")) {
         return this._serveFile(res, "public" + pathname, "application/javascript");
+      }
+      if (method === "GET" && pathname.startsWith("/img/")) {
+        const ext = pathname.split(".").pop();
+        const types = { svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", ico: "image/x-icon" };
+        return this._serveFile(res, "public" + pathname, types[ext] || "application/octet-stream");
       }
 
       // API routes
@@ -232,6 +242,69 @@ class GovernanceServer {
       if (pathname.match(/^\/api\/audit\/identity\/[a-f0-9]+$/) && method === "GET") {
         const id = pathname.split("/").pop();
         return this._json(res, 200, { activity: this.audit.getIdentityActivity(id) });
+      }
+
+      // --- Biometric (WebAuthn-style) ---
+      if (pathname === "/api/biometric/register-challenge" && method === "POST") {
+        const identity = this.identityRegistry.get(body.fingerprint);
+        if (!identity) return this._json(res, 404, { error: "Identity not found" });
+        if (this.biometricCredentials.has(body.fingerprint)) {
+          return this._json(res, 409, { error: "Biometric already enrolled" });
+        }
+        const challenge = cryptoUtil.generateNonce();
+        const challengeId = cryptoUtil.generateId();
+        this.biometricChallenges.set(challengeId, {
+          fingerprint: body.fingerprint,
+          challenge,
+          type: "register",
+          expiresAt: Date.now() + 5 * 60 * 1000,
+        });
+        return this._json(res, 200, { challengeId, challenge, fingerprint: body.fingerprint });
+      }
+      if (pathname === "/api/biometric/register-complete" && method === "POST") {
+        const pending = this.biometricChallenges.get(body.challengeId);
+        if (!pending || pending.type !== "register" || Date.now() > pending.expiresAt) {
+          return this._json(res, 400, { error: "Invalid or expired challenge" });
+        }
+        this.biometricChallenges.delete(body.challengeId);
+        this.biometricCredentials.set(pending.fingerprint, {
+          credentialId: body.credentialId,
+          publicKeyHash: cryptoUtil.hash(body.credentialId + pending.challenge),
+          counter: 0,
+          enrolledAt: Date.now(),
+        });
+        return this._json(res, 201, { enrolled: true, fingerprint: pending.fingerprint });
+      }
+      if (pathname === "/api/biometric/auth-challenge" && method === "POST") {
+        const cred = this.biometricCredentials.get(body.fingerprint);
+        if (!cred) return this._json(res, 404, { error: "No biometric enrolled for this identity" });
+        const challenge = cryptoUtil.generateNonce();
+        const challengeId = cryptoUtil.generateId();
+        this.biometricChallenges.set(challengeId, {
+          fingerprint: body.fingerprint,
+          challenge,
+          credentialId: cred.credentialId,
+          type: "auth",
+          expiresAt: Date.now() + 5 * 60 * 1000,
+        });
+        return this._json(res, 200, { challengeId, challenge, credentialId: cred.credentialId });
+      }
+      if (pathname === "/api/biometric/auth-complete" && method === "POST") {
+        const pending = this.biometricChallenges.get(body.challengeId);
+        if (!pending || pending.type !== "auth" || Date.now() > pending.expiresAt) {
+          return this._json(res, 400, { error: "Invalid or expired challenge" });
+        }
+        const cred = this.biometricCredentials.get(pending.fingerprint);
+        if (!cred || cred.credentialId !== body.credentialId) {
+          return this._json(res, 403, { error: "Credential mismatch" });
+        }
+        this.biometricChallenges.delete(body.challengeId);
+        cred.counter++;
+        return this._json(res, 200, { authenticated: true, fingerprint: pending.fingerprint });
+      }
+      if (pathname === "/api/biometric/status" && method === "POST") {
+        const enrolled = this.biometricCredentials.has(body.fingerprint);
+        return this._json(res, 200, { fingerprint: body.fingerprint, enrolled });
       }
 
       // --- Stats ---

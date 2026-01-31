@@ -3,219 +3,364 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenGov — Decentralized Governance Dashboard</title>
+  <title>OpenGov — Decentralized Governance</title>
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
-  <header>
-    <h1>OpenGov</h1>
-    <p class="subtitle">Decentralized Transparent Governance</p>
+  <!-- Biometric Auth Overlay -->
+  <div id="bio-overlay" class="bio-overlay hidden">
+    <div class="bio-modal">
+      <div class="bio-icon" id="bio-icon">
+        <svg viewBox="0 0 64 64" width="80" height="80">
+          <circle cx="32" cy="32" r="30" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.3"/>
+          <path d="M32 12 C20 12 14 22 14 32 C14 42 20 52 32 52" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" class="bio-arc a1"/>
+          <path d="M32 18 C23 18 19 25 19 32 C19 39 23 46 32 46" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" class="bio-arc a2"/>
+          <path d="M32 24 C26 24 24 28 24 32 C24 36 26 40 32 40" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" class="bio-arc a3"/>
+          <circle cx="32" cy="32" r="3" fill="var(--accent)" class="bio-dot"/>
+          <path d="M50 12 C44 18 38 24 38 32 C38 40 42 48 50 52" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" class="bio-arc a4"/>
+          <path d="M44 18 C40 22 36 26 36 32 C36 38 40 44 44 48" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" class="bio-arc a5"/>
+        </svg>
+      </div>
+      <h3 id="bio-title">Biometric Verification Required</h3>
+      <p id="bio-message">Place your finger on the sensor or use face recognition to authenticate before casting your vote.</p>
+      <button id="bio-trigger" class="btn btn-bio">Authenticate</button>
+      <button id="bio-cancel" class="btn btn-ghost">Cancel</button>
+      <div id="bio-status" class="bio-status"></div>
+    </div>
+  </div>
+
+  <!-- Biometric Enrollment Modal -->
+  <div id="bio-enroll-overlay" class="bio-overlay hidden">
+    <div class="bio-modal">
+      <div class="bio-icon pulse">
+        <svg viewBox="0 0 64 64" width="72" height="72">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="var(--green)" stroke-width="2" stroke-dasharray="4 4"/>
+          <path d="M22 32 L29 39 L42 26" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Enroll Biometric</h3>
+      <p>Link your biometric data to your identity for secure vote authentication. This is required before you can cast any vote.</p>
+      <div class="enroll-field">
+        <label>Your Fingerprint ID</label>
+        <input type="text" id="enroll-fingerprint" placeholder="Paste your identity fingerprint">
+      </div>
+      <button id="bio-enroll-btn" class="btn btn-green">Enroll Now</button>
+      <button id="bio-enroll-cancel" class="btn btn-ghost">Later</button>
+      <div id="enroll-status" class="bio-status"></div>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 36 36" width="36" height="36">
+          <polygon points="18,2 33,10 33,26 18,34 3,26 3,10" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <polygon points="18,8 27,13 27,23 18,28 9,23 9,13" fill="var(--accent)" opacity="0.15"/>
+          <circle cx="18" cy="18" r="4" fill="var(--accent)"/>
+        </svg>
+      </div>
+      <span class="logo-text">OpenGov</span>
+    </div>
     <nav>
-      <button class="nav-btn active" data-tab="overview">Overview</button>
-      <button class="nav-btn" data-tab="identity">Identity</button>
-      <button class="nav-btn" data-tab="proposals">Proposals</button>
-      <button class="nav-btn" data-tab="petitions">Petitions</button>
-      <button class="nav-btn" data-tab="voting">Voting</button>
-      <button class="nav-btn" data-tab="audit">Audit</button>
+      <button class="nav-item active" data-tab="overview">
+        <svg viewBox="0 0 20 20" width="18" height="18"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.3"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" data-tab="identity">
+        <svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="7" r="4" fill="currentColor"/><path d="M3 18 C3 14 6 11 10 11 C14 11 17 14 17 18" fill="currentColor" opacity="0.5"/></svg>
+        Identity
+      </button>
+      <button class="nav-item" data-tab="proposals">
+        <svg viewBox="0 0 20 20" width="18" height="18"><rect x="3" y="2" width="14" height="16" rx="2" fill="currentColor" opacity="0.3"/><line x1="6" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="6" y1="14" x2="11" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>
+        Proposals
+      </button>
+      <button class="nav-item" data-tab="petitions">
+        <svg viewBox="0 0 20 20" width="18" height="18"><path d="M4 16 L4 4 C4 3 5 2 6 2 L14 2 C15 2 16 3 16 4 L16 16" fill="currentColor" opacity="0.3"/><path d="M7 10 L10 13 L16 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Petitions
+      </button>
+      <button class="nav-item" data-tab="voting">
+        <svg viewBox="0 0 20 20" width="18" height="18"><rect x="3" y="10" width="14" height="8" rx="1.5" fill="currentColor" opacity="0.3"/><path d="M7 10 L7 6 L13 6 L13 10" fill="currentColor"/><path d="M10 3 L10 6" stroke="currentColor" stroke-width="1.5"/></svg>
+        Voting
+      </button>
+      <button class="nav-item" data-tab="audit">
+        <svg viewBox="0 0 20 20" width="18" height="18"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2"/><line x1="13.5" y1="13.5" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Audit
+      </button>
     </nav>
-  </header>
+    <div class="sidebar-footer">
+      <button id="btn-enroll-bio" class="btn btn-sm btn-outline">
+        <svg viewBox="0 0 20 20" width="14" height="14"><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2 C5 2 2 6 2 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 2 C15 2 18 6 18 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 18 C5 18 2 14 2 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 18 C15 18 18 14 18 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Enroll Biometric
+      </button>
+      <div class="chain-badge" id="chain-badge">
+        <span class="dot"></span> Checking...
+      </div>
+    </div>
+  </aside>
 
   <main>
-    <!-- Overview -->
-    <section id="tab-overview" class="tab-content active">
-      <h2>System Overview</h2>
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Chain Status</div>
-          <div class="stat-value" id="stat-chain-valid">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Blocks</div>
-          <div class="stat-value" id="stat-blocks">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Ledger Entries</div>
-          <div class="stat-value" id="stat-entries">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Identities</div>
-          <div class="stat-value" id="stat-identities">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Proposals</div>
-          <div class="stat-value" id="stat-proposals">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Active Petitions</div>
-          <div class="stat-value" id="stat-petitions">—</div>
-        </div>
+    <header class="topbar">
+      <h2 id="page-title">System Overview</h2>
+      <div class="topbar-right">
+        <div class="live-indicator"><span class="live-dot"></span> Live</div>
       </div>
-      <div id="transparency-report" class="report-box"></div>
-    </section>
+    </header>
 
-    <!-- Identity -->
-    <section id="tab-identity" class="tab-content">
-      <h2>Identity Management</h2>
-      <div class="card">
-        <h3>Generate New Key Pair</h3>
-        <p>Your private key never leaves your device. Keep it safe — it is your identity.</p>
-        <button id="btn-generate-keys" class="btn">Generate Key Pair</button>
-        <div id="keypair-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Register Identity</h3>
-        <form id="form-register">
-          <label>Alias <input type="text" name="alias" placeholder="Your public alias"></label>
-          <label>Jurisdiction <input type="text" name="jurisdiction" placeholder="e.g. US, US-CA, global"></label>
-          <label>Public Key (PEM) <textarea name="publicKey" rows="4"></textarea></label>
-          <label>Private Key (PEM) <textarea name="privateKey" rows="4"></textarea></label>
-          <button type="submit" class="btn">Register</button>
-        </form>
-        <div id="register-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Registered Identities</h3>
-        <button id="btn-list-identities" class="btn btn-sm">Refresh</button>
-        <div id="identity-list" class="output"></div>
-      </div>
-    </section>
+    <div class="content">
+      <!-- Overview -->
+      <section id="tab-overview" class="tab active">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-number" id="stat-blocks">--</div>
+            <div class="stat-label">Blocks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-entries">--</div>
+            <div class="stat-label">Ledger Entries</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-identities">--</div>
+            <div class="stat-label">Identities</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-proposals">--</div>
+            <div class="stat-label">Proposals</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-petitions">--</div>
+            <div class="stat-label">Active Petitions</div>
+          </div>
+          <div class="stat-card accent">
+            <div class="stat-number" id="stat-chain-valid">--</div>
+            <div class="stat-label">Chain Integrity</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Transparency Report</h3>
+            <button id="btn-transparency-report" class="btn btn-sm">Generate</button>
+          </div>
+          <div id="report-output" class="output"></div>
+        </div>
+      </section>
 
-    <!-- Proposals -->
-    <section id="tab-proposals" class="tab-content">
-      <h2>Proposals</h2>
-      <div class="card">
-        <h3>Create Proposal</h3>
-        <form id="form-proposal">
-          <label>Type
-            <select name="type">
-              <option value="LAW">Law</option>
-              <option value="AMENDMENT">Amendment</option>
-              <option value="REPEAL">Repeal</option>
-              <option value="RESOLUTION">Resolution</option>
-            </select>
-          </label>
-          <label>Title <input type="text" name="title" required></label>
-          <label>Full Text <textarea name="fullText" rows="6" required></textarea></label>
-          <label>Summary <textarea name="summary" rows="3"></textarea></label>
-          <label>Implications (one per line — mandatory)
-            <textarea name="implications" rows="4" required placeholder="Each line is one implication voters must read"></textarea>
-          </label>
-          <label>Jurisdiction <input type="text" name="jurisdiction" value="national"></label>
-          <label>Author Fingerprint <input type="text" name="authorFingerprint" required></label>
-          <label>Author Private Key <textarea name="authorPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Create Proposal</button>
-        </form>
-        <div id="proposal-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>All Proposals</h3>
-        <button id="btn-list-proposals" class="btn btn-sm">Refresh</button>
-        <div id="proposal-list" class="output"></div>
-      </div>
-    </section>
+      <!-- Identity -->
+      <section id="tab-identity" class="tab">
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Generate Key Pair</h3>
+            <p class="hint">Your private key never leaves your device.</p>
+            <button id="btn-generate-keys" class="btn">Generate</button>
+            <div id="keypair-output" class="output"></div>
+          </div>
+          <div class="panel">
+            <h3>Registered Identities</h3>
+            <button id="btn-list-identities" class="btn btn-sm">Refresh</button>
+            <div id="identity-list" class="output"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Register Identity</h3>
+          <form id="form-register" class="form-grid">
+            <label>
+              <span>Alias</span>
+              <input type="text" name="alias" placeholder="Public alias">
+            </label>
+            <label>
+              <span>Jurisdiction</span>
+              <input type="text" name="jurisdiction" placeholder="e.g. US, global">
+            </label>
+            <label class="full">
+              <span>Public Key (PEM)</span>
+              <textarea name="publicKey" rows="3"></textarea>
+            </label>
+            <label class="full">
+              <span>Private Key (PEM)</span>
+              <textarea name="privateKey" rows="3"></textarea>
+            </label>
+            <div class="form-actions full">
+              <button type="submit" class="btn">Register</button>
+            </div>
+          </form>
+          <div id="register-output" class="output"></div>
+        </div>
+      </section>
 
-    <!-- Petitions -->
-    <section id="tab-petitions" class="tab-content">
-      <h2>Petitions</h2>
-      <div class="card">
-        <h3>Open Petition for Proposal</h3>
-        <form id="form-open-petition">
-          <label>Proposal ID <input type="text" name="proposalId" required></label>
-          <label>Signature Threshold <input type="number" name="threshold" value="300"></label>
-          <label>Author Fingerprint <input type="text" name="authorFingerprint" required></label>
-          <label>Author Private Key <textarea name="authorPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Open Petition</button>
-        </form>
-        <div id="open-petition-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Sign a Petition</h3>
-        <div class="notice">By signing, you confirm you have read and understood all implications listed in the proposal.</div>
-        <form id="form-sign-petition">
-          <label>Proposal ID <input type="text" name="proposalId" required></label>
-          <label>Your Fingerprint <input type="text" name="signerFingerprint" required></label>
-          <label>Your Private Key <textarea name="signerPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Sign Petition</button>
-        </form>
-        <div id="sign-petition-output" class="output"></div>
-      </div>
-    </section>
+      <!-- Proposals -->
+      <section id="tab-proposals" class="tab">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>All Proposals</h3>
+            <button id="btn-list-proposals" class="btn btn-sm">Refresh</button>
+          </div>
+          <div id="proposal-list" class="output"></div>
+        </div>
+        <div class="panel">
+          <h3>Create Proposal</h3>
+          <form id="form-proposal" class="form-grid">
+            <label>
+              <span>Type</span>
+              <select name="type">
+                <option value="LAW">Law</option>
+                <option value="AMENDMENT">Amendment</option>
+                <option value="REPEAL">Repeal</option>
+                <option value="RESOLUTION">Resolution</option>
+              </select>
+            </label>
+            <label>
+              <span>Jurisdiction</span>
+              <input type="text" name="jurisdiction" value="national">
+            </label>
+            <label class="full">
+              <span>Title</span>
+              <input type="text" name="title" required>
+            </label>
+            <label class="full">
+              <span>Full Text</span>
+              <textarea name="fullText" rows="5" required></textarea>
+            </label>
+            <label class="full">
+              <span>Summary</span>
+              <textarea name="summary" rows="2"></textarea>
+            </label>
+            <label class="full">
+              <span>Implications (one per line)</span>
+              <textarea name="implications" rows="3" required placeholder="Each line is one implication voters must read"></textarea>
+            </label>
+            <label>
+              <span>Author Fingerprint</span>
+              <input type="text" name="authorFingerprint" required>
+            </label>
+            <label class="full">
+              <span>Author Private Key</span>
+              <textarea name="authorPrivateKey" rows="3" required></textarea>
+            </label>
+            <div class="form-actions full">
+              <button type="submit" class="btn">Create Proposal</button>
+            </div>
+          </form>
+          <div id="proposal-output" class="output"></div>
+        </div>
+      </section>
 
-    <!-- Voting -->
-    <section id="tab-voting" class="tab-content">
-      <h2>Voting</h2>
-      <div class="card">
-        <h3>Open Voting on Proposal</h3>
-        <form id="form-open-voting">
-          <label>Proposal ID <input type="text" name="proposalId" required></label>
-          <label>Your Fingerprint <input type="text" name="actorFingerprint" required></label>
-          <label>Your Private Key <textarea name="actorPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Open Voting</button>
-        </form>
-        <div id="open-voting-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Cast Vote (Commit–Reveal)</h3>
-        <p>Step 1: Choose your vote and commit. Step 2: Reveal your vote after the commit phase ends.</p>
-        <form id="form-vote-commit">
-          <label>Proposal ID <input type="text" name="proposalId" required></label>
-          <label>Your Vote
-            <select name="choice">
-              <option value="YEA">Yea</option>
-              <option value="NAY">Nay</option>
-              <option value="ABSTAIN">Abstain</option>
-            </select>
-          </label>
-          <label>Your Fingerprint <input type="text" name="voterFingerprint" required></label>
-          <label>Your Private Key <textarea name="voterPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Commit & Reveal Vote</button>
-        </form>
-        <div id="vote-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Finalise Vote & Tally</h3>
-        <form id="form-finalise">
-          <label>Proposal ID <input type="text" name="proposalId" required></label>
-          <label>Your Fingerprint <input type="text" name="actorFingerprint" required></label>
-          <label>Your Private Key <textarea name="actorPrivateKey" rows="4" required></textarea></label>
-          <button type="submit" class="btn">Finalise & Tally</button>
-        </form>
-        <div id="finalise-output" class="output"></div>
-      </div>
-    </section>
+      <!-- Petitions -->
+      <section id="tab-petitions" class="tab">
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Open Petition</h3>
+            <form id="form-open-petition">
+              <label><span>Proposal ID</span><input type="text" name="proposalId" required></label>
+              <label><span>Signature Threshold</span><input type="number" name="threshold" value="300"></label>
+              <label><span>Author Fingerprint</span><input type="text" name="authorFingerprint" required></label>
+              <label><span>Author Private Key</span><textarea name="authorPrivateKey" rows="3" required></textarea></label>
+              <button type="submit" class="btn">Open Petition</button>
+            </form>
+            <div id="open-petition-output" class="output"></div>
+          </div>
+          <div class="panel">
+            <h3>Sign a Petition</h3>
+            <div class="notice">By signing you confirm you have read all implications.</div>
+            <form id="form-sign-petition">
+              <label><span>Proposal ID</span><input type="text" name="proposalId" required></label>
+              <label><span>Your Fingerprint</span><input type="text" name="signerFingerprint" required></label>
+              <label><span>Your Private Key</span><textarea name="signerPrivateKey" rows="3" required></textarea></label>
+              <button type="submit" class="btn">Sign Petition</button>
+            </form>
+            <div id="sign-petition-output" class="output"></div>
+          </div>
+        </div>
+      </section>
 
-    <!-- Audit -->
-    <section id="tab-audit" class="tab-content">
-      <h2>Audit & Transparency</h2>
-      <div class="card">
-        <h3>Chain Integrity</h3>
-        <button id="btn-verify-chain" class="btn btn-sm">Verify Chain</button>
-        <div id="chain-verify-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Transparency Report</h3>
-        <button id="btn-transparency-report" class="btn btn-sm">Generate Report</button>
-        <div id="report-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Verify Entry</h3>
-        <form id="form-verify-entry">
-          <label>Entry ID <input type="text" name="entryId" required></label>
-          <button type="submit" class="btn btn-sm">Verify</button>
-        </form>
-        <div id="entry-verify-output" class="output"></div>
-      </div>
-      <div class="card">
-        <h3>Export Full Ledger</h3>
-        <button id="btn-export-ledger" class="btn btn-sm">Export JSON</button>
-        <div id="ledger-export-output" class="output"></div>
-      </div>
-    </section>
+      <!-- Voting -->
+      <section id="tab-voting" class="tab">
+        <div class="bio-banner" id="bio-banner">
+          <svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2 C5 2 2 6 2 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 18 C15 18 18 14 18 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Biometric authentication is required before casting any vote.</span>
+        </div>
+        <div class="panel">
+          <h3>Open Voting on Proposal</h3>
+          <form id="form-open-voting" class="form-inline">
+            <label><span>Proposal ID</span><input type="text" name="proposalId" required></label>
+            <label><span>Your Fingerprint</span><input type="text" name="actorFingerprint" required></label>
+            <label class="full"><span>Your Private Key</span><textarea name="actorPrivateKey" rows="3" required></textarea></label>
+            <div class="form-actions full"><button type="submit" class="btn">Open Voting</button></div>
+          </form>
+          <div id="open-voting-output" class="output"></div>
+        </div>
+        <div class="panel highlight">
+          <h3>Cast Vote</h3>
+          <p class="hint">Your vote is cryptographically committed then revealed — ballot secrecy is guaranteed during the commit phase.</p>
+          <form id="form-vote-commit">
+            <label><span>Proposal ID</span><input type="text" name="proposalId" required></label>
+            <div class="vote-choices">
+              <label class="choice-card">
+                <input type="radio" name="choice" value="YEA" required>
+                <div class="choice-body yea">
+                  <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 6 L9 17 L4 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Yea</span>
+                </div>
+              </label>
+              <label class="choice-card">
+                <input type="radio" name="choice" value="NAY">
+                <div class="choice-body nay">
+                  <svg viewBox="0 0 24 24" width="28" height="28"><path d="M18 6 L6 18 M6 6 L18 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  <span>Nay</span>
+                </div>
+              </label>
+              <label class="choice-card">
+                <input type="radio" name="choice" value="ABSTAIN">
+                <div class="choice-body abstain">
+                  <svg viewBox="0 0 24 24" width="28" height="28"><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  <span>Abstain</span>
+                </div>
+              </label>
+            </div>
+            <label><span>Your Fingerprint</span><input type="text" name="voterFingerprint" required></label>
+            <label class="full"><span>Your Private Key</span><textarea name="voterPrivateKey" rows="3" required></textarea></label>
+            <div class="form-actions full"><button type="submit" class="btn btn-vote">Authenticate & Cast Vote</button></div>
+          </form>
+          <div id="vote-output" class="output"></div>
+        </div>
+        <div class="panel">
+          <h3>Finalise & Tally</h3>
+          <form id="form-finalise" class="form-inline">
+            <label><span>Proposal ID</span><input type="text" name="proposalId" required></label>
+            <label><span>Your Fingerprint</span><input type="text" name="actorFingerprint" required></label>
+            <label class="full"><span>Your Private Key</span><textarea name="actorPrivateKey" rows="3" required></textarea></label>
+            <div class="form-actions full"><button type="submit" class="btn">Finalise & Tally</button></div>
+          </form>
+          <div id="finalise-output" class="output"></div>
+        </div>
+      </section>
+
+      <!-- Audit -->
+      <section id="tab-audit" class="tab">
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Chain Integrity</h3>
+            <button id="btn-verify-chain" class="btn btn-sm">Verify Chain</button>
+            <div id="chain-verify-output" class="output"></div>
+          </div>
+          <div class="panel">
+            <h3>Verify Entry</h3>
+            <form id="form-verify-entry">
+              <label><span>Entry ID</span><input type="text" name="entryId" required></label>
+              <button type="submit" class="btn btn-sm">Verify</button>
+            </form>
+            <div id="entry-verify-output" class="output"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Full Ledger Export</h3>
+            <button id="btn-export-ledger" class="btn btn-sm">Export JSON</button>
+          </div>
+          <div id="ledger-export-output" class="output"></div>
+        </div>
+      </section>
+    </div>
   </main>
-
-  <footer>
-    <p>OpenGov — Open Source Decentralized Governance · All data is publicly verifiable · Zero trust required</p>
-  </footer>
 
   <script src="/js/dashboard.js"></script>
 </body>
