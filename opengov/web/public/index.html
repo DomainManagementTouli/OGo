@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenGov — Decentralized Governance Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>OpenGov</h1>
+    <p class="subtitle">Decentralized Transparent Governance</p>
+    <nav>
+      <button class="nav-btn active" data-tab="overview">Overview</button>
+      <button class="nav-btn" data-tab="identity">Identity</button>
+      <button class="nav-btn" data-tab="proposals">Proposals</button>
+      <button class="nav-btn" data-tab="petitions">Petitions</button>
+      <button class="nav-btn" data-tab="voting">Voting</button>
+      <button class="nav-btn" data-tab="audit">Audit</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Overview -->
+    <section id="tab-overview" class="tab-content active">
+      <h2>System Overview</h2>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Chain Status</div>
+          <div class="stat-value" id="stat-chain-valid">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Blocks</div>
+          <div class="stat-value" id="stat-blocks">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Ledger Entries</div>
+          <div class="stat-value" id="stat-entries">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Identities</div>
+          <div class="stat-value" id="stat-identities">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Proposals</div>
+          <div class="stat-value" id="stat-proposals">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Petitions</div>
+          <div class="stat-value" id="stat-petitions">—</div>
+        </div>
+      </div>
+      <div id="transparency-report" class="report-box"></div>
+    </section>
+
+    <!-- Identity -->
+    <section id="tab-identity" class="tab-content">
+      <h2>Identity Management</h2>
+      <div class="card">
+        <h3>Generate New Key Pair</h3>
+        <p>Your private key never leaves your device. Keep it safe — it is your identity.</p>
+        <button id="btn-generate-keys" class="btn">Generate Key Pair</button>
+        <div id="keypair-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Register Identity</h3>
+        <form id="form-register">
+          <label>Alias <input type="text" name="alias" placeholder="Your public alias"></label>
+          <label>Jurisdiction <input type="text" name="jurisdiction" placeholder="e.g. US, US-CA, global"></label>
+          <label>Public Key (PEM) <textarea name="publicKey" rows="4"></textarea></label>
+          <label>Private Key (PEM) <textarea name="privateKey" rows="4"></textarea></label>
+          <button type="submit" class="btn">Register</button>
+        </form>
+        <div id="register-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Registered Identities</h3>
+        <button id="btn-list-identities" class="btn btn-sm">Refresh</button>
+        <div id="identity-list" class="output"></div>
+      </div>
+    </section>
+
+    <!-- Proposals -->
+    <section id="tab-proposals" class="tab-content">
+      <h2>Proposals</h2>
+      <div class="card">
+        <h3>Create Proposal</h3>
+        <form id="form-proposal">
+          <label>Type
+            <select name="type">
+              <option value="LAW">Law</option>
+              <option value="AMENDMENT">Amendment</option>
+              <option value="REPEAL">Repeal</option>
+              <option value="RESOLUTION">Resolution</option>
+            </select>
+          </label>
+          <label>Title <input type="text" name="title" required></label>
+          <label>Full Text <textarea name="fullText" rows="6" required></textarea></label>
+          <label>Summary <textarea name="summary" rows="3"></textarea></label>
+          <label>Implications (one per line — mandatory)
+            <textarea name="implications" rows="4" required placeholder="Each line is one implication voters must read"></textarea>
+          </label>
+          <label>Jurisdiction <input type="text" name="jurisdiction" value="national"></label>
+          <label>Author Fingerprint <input type="text" name="authorFingerprint" required></label>
+          <label>Author Private Key <textarea name="authorPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Create Proposal</button>
+        </form>
+        <div id="proposal-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>All Proposals</h3>
+        <button id="btn-list-proposals" class="btn btn-sm">Refresh</button>
+        <div id="proposal-list" class="output"></div>
+      </div>
+    </section>
+
+    <!-- Petitions -->
+    <section id="tab-petitions" class="tab-content">
+      <h2>Petitions</h2>
+      <div class="card">
+        <h3>Open Petition for Proposal</h3>
+        <form id="form-open-petition">
+          <label>Proposal ID <input type="text" name="proposalId" required></label>
+          <label>Signature Threshold <input type="number" name="threshold" value="300"></label>
+          <label>Author Fingerprint <input type="text" name="authorFingerprint" required></label>
+          <label>Author Private Key <textarea name="authorPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Open Petition</button>
+        </form>
+        <div id="open-petition-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Sign a Petition</h3>
+        <div class="notice">By signing, you confirm you have read and understood all implications listed in the proposal.</div>
+        <form id="form-sign-petition">
+          <label>Proposal ID <input type="text" name="proposalId" required></label>
+          <label>Your Fingerprint <input type="text" name="signerFingerprint" required></label>
+          <label>Your Private Key <textarea name="signerPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Sign Petition</button>
+        </form>
+        <div id="sign-petition-output" class="output"></div>
+      </div>
+    </section>
+
+    <!-- Voting -->
+    <section id="tab-voting" class="tab-content">
+      <h2>Voting</h2>
+      <div class="card">
+        <h3>Open Voting on Proposal</h3>
+        <form id="form-open-voting">
+          <label>Proposal ID <input type="text" name="proposalId" required></label>
+          <label>Your Fingerprint <input type="text" name="actorFingerprint" required></label>
+          <label>Your Private Key <textarea name="actorPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Open Voting</button>
+        </form>
+        <div id="open-voting-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Cast Vote (Commit–Reveal)</h3>
+        <p>Step 1: Choose your vote and commit. Step 2: Reveal your vote after the commit phase ends.</p>
+        <form id="form-vote-commit">
+          <label>Proposal ID <input type="text" name="proposalId" required></label>
+          <label>Your Vote
+            <select name="choice">
+              <option value="YEA">Yea</option>
+              <option value="NAY">Nay</option>
+              <option value="ABSTAIN">Abstain</option>
+            </select>
+          </label>
+          <label>Your Fingerprint <input type="text" name="voterFingerprint" required></label>
+          <label>Your Private Key <textarea name="voterPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Commit & Reveal Vote</button>
+        </form>
+        <div id="vote-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Finalise Vote & Tally</h3>
+        <form id="form-finalise">
+          <label>Proposal ID <input type="text" name="proposalId" required></label>
+          <label>Your Fingerprint <input type="text" name="actorFingerprint" required></label>
+          <label>Your Private Key <textarea name="actorPrivateKey" rows="4" required></textarea></label>
+          <button type="submit" class="btn">Finalise & Tally</button>
+        </form>
+        <div id="finalise-output" class="output"></div>
+      </div>
+    </section>
+
+    <!-- Audit -->
+    <section id="tab-audit" class="tab-content">
+      <h2>Audit & Transparency</h2>
+      <div class="card">
+        <h3>Chain Integrity</h3>
+        <button id="btn-verify-chain" class="btn btn-sm">Verify Chain</button>
+        <div id="chain-verify-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Transparency Report</h3>
+        <button id="btn-transparency-report" class="btn btn-sm">Generate Report</button>
+        <div id="report-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Verify Entry</h3>
+        <form id="form-verify-entry">
+          <label>Entry ID <input type="text" name="entryId" required></label>
+          <button type="submit" class="btn btn-sm">Verify</button>
+        </form>
+        <div id="entry-verify-output" class="output"></div>
+      </div>
+      <div class="card">
+        <h3>Export Full Ledger</h3>
+        <button id="btn-export-ledger" class="btn btn-sm">Export JSON</button>
+        <div id="ledger-export-output" class="output"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>OpenGov — Open Source Decentralized Governance · All data is publicly verifiable · Zero trust required</p>
+  </footer>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
